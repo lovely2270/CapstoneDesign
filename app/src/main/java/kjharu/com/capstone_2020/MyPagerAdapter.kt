@@ -1,27 +1,41 @@
 package kjharu.com.capstone_2020
 
+import android.R.attr.fragment
+import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 
-class MyPagerAdapter(fm : FragmentManager) : FragmentPagerAdapter(fm) {
+
+class MyPagerAdapter(fm : FragmentManager, userId : String?) : FragmentPagerAdapter(fm) {
+
+    var userId = userId
     override fun getItem(position: Int): Fragment {
-        return when (position) { //switch()문과 동일하다.
-            0 -> {StockFragment()}
-            1 -> {EmpFragment()}
-            else -> {return SalesFragment()}
+        val bundle = Bundle(1) // 파라미터는 전달할 데이터 개수
+        bundle.putString("userId", userId) // key , value
+
+        if (position == 0) {
+            return StockFragment(userId)
+        } else if (position == 1) {
+            return AheadFragment(userId)
+        } else if (position == 2) {
+            return EmpFragment(userId)
+        } else if (position == 3) {
+            return SalesFragment(userId)
         }
+        return StockFragment(userId)
     }
 
     override fun getCount(): Int {
-        return 3 //3개니깐
+        return 4 //4개니깐
     }
 
     override fun getPageTitle(position: Int): CharSequence? {
         return when (position){
             0 -> "재고관리"
-            1 -> "직원관리"
-            else -> {return "판매"}
+            1 -> "입고예정"
+            2 -> "직원관리"
+            else -> {return "매출정보"}
         }
     }
 

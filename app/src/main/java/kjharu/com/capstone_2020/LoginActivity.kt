@@ -39,7 +39,6 @@ class LoginActivity : AppCompatActivity() {
     //id가 존재하는지 확인
     val checkLogin = object : ValueEventListener {
         override fun onDataChange(dataSnapshot: DataSnapshot) {
-            Toast.makeText(applicationContext,"들어옴", Toast.LENGTH_LONG).show()
             for (child in dataSnapshot.children) {
                 //아이디있나
                 if (child.key.toString().equals(editTextID.text.toString())) {

@@ -9,7 +9,9 @@ fun Dialogmessage(context: Activity, title: String, message: String,close:String
     builder.setTitle(title)
     builder.setMessage(message)
 
+    builder.setNegativeButton("취소",null)
     if(close==null) {
+
         builder.setPositiveButton("확인", null)
     }
     else if(close.equals("close")) {

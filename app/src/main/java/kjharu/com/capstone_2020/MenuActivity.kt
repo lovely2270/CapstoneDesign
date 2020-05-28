@@ -21,7 +21,7 @@ class MenuActivity : AppCompatActivity() {
         setTitle("떡잎방범대")
         userId = intent.getStringExtra("userId")
 
-        val fragmentAdapter = MyPagerAdapter(supportFragmentManager)
+        val fragmentAdapter = MyPagerAdapter(supportFragmentManager, userId)
         viewpager.adapter = fragmentAdapter
         tab.setupWithViewPager(viewpager)
     }
