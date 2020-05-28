@@ -14,7 +14,7 @@ class MyPageActivity : AppCompatActivity() {
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_mypage)
-        setTitle("떡잎방범대 마이페이지111")
+        setTitle("떡잎방범대 마이페이지222")
         userId = intent.getStringExtra("userId")
         textView7.setText(userId)
 
