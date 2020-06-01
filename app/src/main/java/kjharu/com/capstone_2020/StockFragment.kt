@@ -21,7 +21,7 @@ class StockFragment(var userId : String?) : Fragment() {
         super.onCreateView(inflater, container, savedInstanceState)
         var inflaterview = inflater.inflate(R.layout.fragment_stock, container, false)
 
-        val item = Array(20, {i -> "$i + list"})
+        val item = Array(20, {""})
         val adapter = StockBaseAdapter(context!!,item)
         val lv = inflaterview.findViewById(R.id.listView) as ListView
         lv.setAdapter(adapter)
