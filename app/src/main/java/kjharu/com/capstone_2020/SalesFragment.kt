@@ -102,6 +102,9 @@ class SalesFragment(var userId : String?) : Fragment() {
                 //매출액 필드 값 변경
                 //user -> userId -> datekey -> sales 의 값
                 var sales = p0.child(userId.toString()).child(datkey).child("sales").value
+                if(sales == null){
+                    sales = 0
+                }
                 textViewSales.setText(sales.toString())
 
                 //매장월세 변경
