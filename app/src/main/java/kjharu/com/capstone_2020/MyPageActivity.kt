@@ -53,6 +53,8 @@ class MyPageActivity : AppCompatActivity() {
                 databaseYM.child("emp").removeValue()
                 //재고 내용 전체 삭제
                 databaseYM.child("stock").removeValue()
+                //입고예정 내용 전체 삭제
+                databaseYM.child("aheadStock").removeValue()
 
                 val intent = Intent(this, LoginActivity::class.java)
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

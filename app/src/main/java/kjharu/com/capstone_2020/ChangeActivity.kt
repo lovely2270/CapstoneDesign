@@ -1,8 +1,13 @@
 package kjharu.com.capstone_2020
 
+import android.content.Context
 import android.os.Bundle
+import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import kotlinx.android.synthetic.main.activity_change.*
 
 class ChangeActivity : AppCompatActivity() {
@@ -39,6 +44,26 @@ class ChangeActivity : AppCompatActivity() {
                 Dialogmessage(this@ChangeActivity,"경고","비번 확인해주세요.")
             }
         }
+
+        //키보드 숨기기
+        ll_change.setOnClickListener {
+            val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+            imm?.hideSoftInputFromWindow(it.windowToken, 0)
+        }
+
+        databaseUser.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(p0: DataSnapshot) {
+                //현재 이름 넣어주기
+                var name = p0.child(userId.toString()).child("name").value.toString()
+                editTextNameForC.setText(name)
+                //현재 매장 월세 넣어주기
+                var rent = p0.child(userId.toString()).child("rentPrice").value.toString()
+                editTextRentPriceForC.setText(rent)
+            }
+            override fun onCancelled(p0: DatabaseError) {
+
+            }
+        })
 
     }
 }

@@ -1,7 +1,9 @@
 package kjharu.com.capstone_2020
 
 
+import android.content.Context
 import android.os.Bundle
+import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.database.FirebaseDatabase
 import kotlinx.android.synthetic.main.activity_join.*
@@ -57,6 +59,12 @@ class JoinActivity : AppCompatActivity() {
                 //아이디 중복확인바람
                 Dialogmessage(this@JoinActivity,"경고","이메일 중복 확인해주세요.")
             }
+        }
+
+        //키보드 숨기기
+        ll_join.setOnClickListener {
+            val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+            imm?.hideSoftInputFromWindow(it.windowToken, 0)
         }
 
     }
