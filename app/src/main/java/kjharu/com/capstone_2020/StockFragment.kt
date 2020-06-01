@@ -64,7 +64,7 @@ class StockFragment(var userId : String?) : Fragment() {
                     adapter.notifyDataSetInvalidated()
 
                 }
-                //sCount = Integer.parseInt(databaseStock.child("sCount").value.toString())
+                sCount = Integer.parseInt(databaseStock.child("sCount").value.toString())
 
             }
             override fun onCancelled(p0: DatabaseError) {
@@ -128,13 +128,13 @@ class StockFragment(var userId : String?) : Fragment() {
                 //리스트에 추가
                 stockList.add(stock)
                 //DB에 저장
-              /*  databaseUser.child(userId.toString()).child(datkey).child("stock").child("s"+sCount).child("stockName").setValue(stockName.text.toString())
+                databaseUser.child(userId.toString()).child(datkey).child("stock").child("s"+sCount).child("stockName").setValue(stockName.text.toString())
                 databaseUser.child(userId.toString()).child(datkey).child("stock").child("s"+sCount).child("stockNum").setValue(stockNum.text.toString())
                 databaseUser.child(userId.toString()).child(datkey).child("stock").child("s"+sCount).child("stockPrice").setValue(stockPrice.text.toString())
 
                 //카운트 추가
                 databaseUser.child(userId.toString()).child(datkey).child("stock").child("sCount").setValue(sCount+1)
-                */
+
                 adapter.notifyDataSetChanged()
                 adapter.notifyDataSetInvalidated()
             }
