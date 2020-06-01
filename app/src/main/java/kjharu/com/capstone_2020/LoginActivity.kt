@@ -1,14 +1,16 @@
 package kjharu.com.capstone_2020
 
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
+import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
-import kotlinx.android.synthetic.main.activity_login.*
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import android.widget.Toast
+import kotlinx.android.synthetic.main.activity_login.*
 
 /**
  * Created by lovel on 2019-10-21.
@@ -34,7 +36,35 @@ class LoginActivity : AppCompatActivity() {
         loginbtn.setOnClickListener {
             databaseUser.addListenerForSingleValueEvent(checkLogin)
         }
+
+        //키보드 숨기기
+        ll_login.setOnClickListener {
+            val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+            imm?.hideSoftInputFromWindow(it.windowToken, 0)
+        }
+
+        //어플끝날때 저장한 id,pw 자동으로 불러와주기
+        if(savedInstanceState == null){
+            var prefs = getSharedPreferences("info", MODE_PRIVATE)
+            //아이디, 패스워드, 라디오 초기값 설정
+            editTextID.setText(prefs.getString("userid",""))
+            editTextPW.setText(prefs.getString("userpassword",""))
+        }
     }
+
+    //어플 끝낼때 로그인 id, pw저장
+    public override fun onDestroy() {
+        super.onDestroy()
+        //preference객체에 저장해주기
+        val prefs = getSharedPreferences("info", 0)
+        val editor = prefs.edit()
+
+        editor.putString("userid", editTextID.text.toString())
+        editor.putString("userpassword", editTextPW.text.toString())
+
+        editor.apply()
+    }
+
     //로그인 확인
     //id가 존재하는지 확인
     val checkLogin = object : ValueEventListener {
