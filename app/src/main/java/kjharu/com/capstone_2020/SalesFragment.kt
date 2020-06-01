@@ -67,7 +67,7 @@ class SalesFragment(var userId : String?) : Fragment() {
 
         //재고비용
         var textViewStock : TextView = inflaterview.findViewById(R.id.textViewStock)
-        
+
         //매출입력 버튼 클릭
         var btn_putSales : Button = inflaterview.findViewById(R.id.btn_putSales)
         btn_putSales.setOnClickListener {
@@ -91,7 +91,7 @@ class SalesFragment(var userId : String?) : Fragment() {
                 }
             }
             builder.show()
-            
+
         }
 
         //데이터값 변경될 시 리스너

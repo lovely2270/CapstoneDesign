@@ -28,7 +28,7 @@ class AheadFragment(var userId : String?) : Fragment() {
     val firebaseReference: FirebaseDatabase = FirebaseDatabase.getInstance()
     val databaseUser = firebaseReference.reference.child("user")
     var aheadStockList = ArrayList<aheadStock>()
-    var sCount : Int = 0
+    var count : Int = 0
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
@@ -70,25 +70,68 @@ class AheadFragment(var userId : String?) : Fragment() {
                     aheadAdapter.notifyDataSetInvalidated()
 
                 }
-               // sCount = Integer.parseInt(databaseStock.child("sCount").value.toString())
-
+                count = databaseStock.childrenCount.toInt()
             }
             override fun onCancelled(p0: DatabaseError) {
 
             }
-
-
         })
 
         //클릭리스너 (수정 시)
         lv.onItemClickListener= AdapterView.OnItemClickListener { parent, view, position, id ->
             databaseUser.addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(p0: DataSnapshot) {
-                    var databaseStock = p0.child(userId.toString()).child(datkey).child("aheadStock")
+                    val dialogView = inflater.inflate(R.layout.aheadstock_add, null)
 
+                    val builder = AlertDialog.Builder(context)
+                    builder.setTitle("입고 수정")
+                    builder.setView(dialogView)
 
+                    //현재 수정하려는 재고의 값들
+                    //현재 입고 날짜
+                    var dateNow = p0.child(userId.toString()).child(datkey).child("aheadStock")
+                        .child("as" + position).child("aheadStockDate").value
+                    //현재 입고명
+                    var nameNow = p0.child(userId.toString()).child(datkey).child("aheadStock")
+                        .child("as" + position).child("aheadStockName").value
+                    //현재 입고량
+                    var numNow = p0.child(userId.toString()).child(datkey).child("aheadStock")
+                        .child("as" + position).child("aheadStockNum").value
+                    //현재 입고 원가
+                    var priceNow = p0.child(userId.toString()).child(datkey).child("aheadStock")
+                        .child("as" + position).child("aheadStockPrice").value
+
+                    val aheadStockDate = dialogView.findViewById<EditText>(R.id.aheadStockDateForAdd)
+                    aheadStockDate.setText(dateNow.toString())
+                    val aheadStockName = dialogView.findViewById<EditText>(R.id.aheadStockNameForAdd)
+                    aheadStockName.setText(nameNow.toString())
+                    val aheadStockNum = dialogView.findViewById<EditText>(R.id.aheadStockNumForAdd)
+                    aheadStockNum.setText(numNow.toString())
+                    val aheadStockPrice = dialogView.findViewById<EditText>(R.id.aheadStockPriceForAdd)
+                    aheadStockPrice.setText(priceNow.toString())
+
+                    builder.setNegativeButton("취소", null)
+                    builder.setPositiveButton("확인") { dialogInterface, i ->
+
+                        //DB에 저장
+                        databaseUser.child(userId.toString()).child(datkey).child("aheadStock")
+                            .child("as" + position).child("aheadStockDate")
+                            .setValue(aheadStockDate.text.toString())
+                        databaseUser.child(userId.toString()).child(datkey).child("aheadStock")
+                            .child("as" + position).child("aheadStockName")
+                            .setValue(aheadStockName.text.toString())
+                        databaseUser.child(userId.toString()).child(datkey).child("aheadStock")
+                            .child("as" + position).child("aheadStockNum")
+                            .setValue(aheadStockNum.text.toString())
+                        databaseUser.child(userId.toString()).child(datkey).child("aheadStock")
+                            .child("as" + position).child("aheadStockPrice")
+                            .setValue(aheadStockPrice.text.toString())
+                    }
+                    aheadAdapter.notifyDataSetChanged()
+                    aheadAdapter.notifyDataSetInvalidated()
+
+                    builder.show()
                 }
-
                 override fun onCancelled(error: DatabaseError) {
                     // Failed to read value
                 }
@@ -97,59 +140,101 @@ class AheadFragment(var userId : String?) : Fragment() {
 
         //길게 누르면 (삭제)
         lv.setOnItemLongClickListener({ parent, view, position, id ->
-            val builder = AlertDialog.Builder(context)
-            builder.setTitle("경고")
-            builder.setMessage("*Id를 삭제하시겠습니까? 모든 내용이 삭제됩니다.*")
+            databaseUser.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(p0: DataSnapshot) {
+                    val databaseAheadStock =
+                        databaseUser.child(userId.toString()).child(datkey).child("aheadStock")
 
-            builder.setNegativeButton("취소", null)
-            builder.setPositiveButton("확인") { dialogInterface, i ->
-                aheadStockList.removeAt(position)
-                databaseUser.child(userId.toString()).child(datkey).child("aheadStock").child("as"+position).removeValue()
+                    val builder = AlertDialog.Builder(context)
+                    builder.setTitle("경고")
+                    builder.setMessage("*입고 품목을 삭제하시겠습니까? 모든 내용이 삭제됩니다.*")
 
-                aheadAdapter.notifyDataSetChanged()
-                aheadAdapter.notifyDataSetInvalidated()
-            }
+                    builder.setNegativeButton("취소", null)
+                    builder.setPositiveButton("확인") { dialogInterface, i ->
 
-            builder.show()
+                        val databaseAheadStockForGet =
+                            p0.child(userId.toString()).child(datkey).child("aheadStock")
+                        //하나씩 앞당겨주기
+                        for (i in position..databaseAheadStockForGet.childrenCount - 1) {
+                            //다음 입고 날짜 가져오기
+                            var nextDate = databaseAheadStockForGet.child("as" + (i + 1))
+                                .child("aheadStockDate").value.toString()
+                            //앞당겨저장
+                            databaseAheadStock.child("as" + i).child("aheadStockDate").setValue(nextDate)
+                            //다음 이름 가져오기
+                            var nextName = databaseAheadStockForGet.child("as" + (i + 1))
+                                .child("aheadStockName").value.toString()
+                            //앞당겨저장
+                            databaseAheadStock.child("as" + i).child("aheadStockName").setValue(nextName)
+                            //다음 재고량 가져오기
+                            var nextNum = databaseAheadStockForGet.child("as" + (i + 1))
+                                .child("aheadStockNum").value.toString()
+                            //앞당겨저장
+                            databaseAheadStock.child("as" + i).child("aheadStockNum").setValue(nextNum)
+                            //다음 재고원가 가져오기
+                            var nextPrice = databaseAheadStockForGet.child("as" + (i + 1))
+                                .child("aheadStockPrice").value.toString()
+                            //앞당겨저장
+                            databaseAheadStock.child("as" + i).child("aheadStockPrice").setValue(nextPrice)
+                        }
+                        //맨 마지막꺼 없애기(앞당겨줬으니)
+                        databaseUser.child(userId.toString()).child(datkey).child("aheadStock")
+                            .child("as" + (databaseAheadStockForGet.childrenCount - 1)).removeValue()
+                    }
+                    aheadAdapter.notifyDataSetChanged()
+                    aheadAdapter.notifyDataSetInvalidated()
+
+                    builder.show()
+                }
+                override fun onCancelled(error: DatabaseError) {
+                    // Failed to read value
+                }
+            })
             true
         })
 
-        //재고 추가 버튼 클릭
-        var btn_addAheadStock : Button = inflaterview.findViewById(R.id.btn_addAheadStock)
+        //입고 추가 버튼 클릭
+        var btn_addAheadStock: Button = inflaterview.findViewById(R.id.btn_addAheadStock)
         btn_addAheadStock.setOnClickListener {
-            val dialogView = inflater.inflate(R.layout.aheadstock_add, null)
+            databaseUser.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(p0: DataSnapshot) {
+                    val dialogView = inflater.inflate(R.layout.aheadstock_add, null)
 
-            val builder = AlertDialog.Builder(context)
-            builder.setTitle("입고 추가")
+                    val builder = AlertDialog.Builder(context)
+                    builder.setTitle("입고 추가")
+                    builder.setView(dialogView)
 
+                    val aheadStockDate = dialogView.findViewById<EditText>(R.id.aheadStockDateForAdd)
+                    val aheadStockName = dialogView.findViewById<EditText>(R.id.aheadStockNameForAdd)
+                    val aheadStockNum = dialogView.findViewById<EditText>(R.id.aheadStockNumForAdd)
+                    val aheadStockPrice = dialogView.findViewById<EditText>(R.id.aheadStockPriceForAdd)
 
-            val aheadStockDate = dialogView.findViewById<EditText>(R.id.aheadStockDateForAdd)
-            val aheadStockName = dialogView.findViewById<EditText>(R.id.aheadStockNameForAdd)
-            val aheadStockNum = dialogView.findViewById<EditText>(R.id.aheadStockNumForAdd)
-            val aheadStockPrice = dialogView.findViewById<EditText>(R.id.aheadStockPriceForAdd)
+                    builder.setNegativeButton("취소", null)
+                    builder.setPositiveButton("확인") { dialogInterface, i ->
 
-            builder.setNegativeButton("취소", null)
-            builder.setPositiveButton("확인") { dialogInterface, i ->
-                var aheadstock : aheadStock = aheadStock(aheadStockDate.text.toString(),aheadStockName.text.toString(),aheadStockNum.text.toString(), aheadStockPrice.text.toString())
-                //리스트에 추가
-                aheadStockList.add(aheadstock)
-                //DB에 저장
-               /* databaseUser.child(userId.toString()).child(datkey).child("aheadStock").child("as"+sCount).child("aheadStockDate").setValue(aheadStockDate.text.toString())
-                databaseUser.child(userId.toString()).child(datkey).child("aheadStock").child("as"+sCount).child("aheadStockName").setValue(aheadStockName.text.toString())
-                databaseUser.child(userId.toString()).child(datkey).child("aheadStock").child("as"+sCount).child("aheadStockNum").setValue(aheadStockNum.text.toString())
-                databaseUser.child(userId.toString()).child(datkey).child("aheadStock").child("as"+sCount).child("aheadStockPrice").setValue(aheadStockPrice.text.toString())
+                        //DB에 저장
+                        databaseUser.child(userId.toString()).child(datkey).child("aheadStock")
+                            .child("as" + count).child("aheadStockDate")
+                            .setValue(aheadStockDate.text.toString())
+                        databaseUser.child(userId.toString()).child(datkey).child("aheadStock")
+                            .child("as" + count).child("aheadStockName")
+                            .setValue(aheadStockName.text.toString())
+                        databaseUser.child(userId.toString()).child(datkey).child("aheadStock")
+                            .child("as" + count).child("aheadStockNum").setValue(aheadStockNum.text.toString())
+                        databaseUser.child(userId.toString()).child(datkey).child("aheadStock")
+                            .child("as" + count).child("aheadStockPrice")
+                            .setValue(aheadStockPrice.text.toString())
+                    }
+                    aheadAdapter.notifyDataSetChanged()
+                    aheadAdapter.notifyDataSetInvalidated()
 
-                //카운트 추가
-                databaseUser.child(userId.toString()).child(datkey).child("aheadStock").child("sCount").setValue(sCount+1)
-                */
-                aheadAdapter.notifyDataSetChanged()
-                aheadAdapter.notifyDataSetInvalidated()
-            }
-
-            builder.show()
+                    builder.show()
+                }
+                override fun onCancelled(error: DatabaseError) {
+                    // Failed to read value
+                }
+            })
         }
-
         return inflaterview
     }
-
 }
