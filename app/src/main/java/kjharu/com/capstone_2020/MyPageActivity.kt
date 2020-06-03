@@ -85,6 +85,10 @@ class MyPageActivity : AppCompatActivity() {
 
         }
 
+        btn_back.setOnClickListener {
+            finish()
+        }
+
         //데이터값 변경될 시 리스너
         databaseUser.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(p0: DataSnapshot) {
