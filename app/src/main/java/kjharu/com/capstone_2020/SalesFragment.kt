@@ -6,16 +6,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import kotlinx.android.synthetic.main.fragment_sales.*
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -95,12 +93,107 @@ class SalesFragment(var userId : String?) : Fragment() {
         }
 
         //데이터값 변경될 시 리스너
+        var btn_refresh : ImageButton = inflaterview.findViewById(R.id.imgbtn_refresh)
+        //var btn_refresh : Button = inflaterview.findViewById(R.id.btn_refresh)
+        btn_refresh.setOnClickListener{
+            databaseUser.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(p0: DataSnapshot) {
+                    //매출액 필드 값 변경
+                    //user -> userId -> datekey -> sales 의 값
+                    var sales = p0.child(userId.toString()).child(datkey).child("sales").value
+                    if (sales == null) {
+                        sales = 0
+                    }
+                    textViewSales.setText(sales.toString())
+
+                    //매장월세 변경
+                    //user -> userId -> rentPrice 의 값
+                    var rent = p0.child(userId.toString()).child("rentPrice").value
+                    if (rent == null) {
+                        rent = 0
+                    }
+                    textViewRent.setText(rent.toString())
+
+                    //직원급여 변경
+                    //user -> userId -> datekey -> emp 의 자식 수세서 for문
+                    var databaseEmp = p0.child(userId.toString()).child(datkey).child("emp")
+                    //직원 수 만큼 돌려
+                    //총금액변수
+                    var salaryM: Int = 0
+                    for (i in 0..databaseEmp.childrenCount - 1) {
+                        //현재 직원의 정보
+                        var databaseNowEmp = databaseEmp.child("e" + i)
+                        //직원 정보의 시급 * 시간
+                        var money =
+                            Integer.parseInt(databaseNowEmp.child("empSalary").value.toString()) * Integer.parseInt(
+                                databaseNowEmp.child("empTime").value.toString()
+                            )
+                        //총 직원 급여 변수에 현재 직원 급여 더하기
+                        salaryM += money
+                    }
+                    //textview에 직원 급여 입력
+                    textViewSalary.setText(salaryM.toString())
+
+                    //재고비용 변경 (재고 + 예정재고)
+                    //재고 총 비용
+                    var databaseStock = p0.child(userId.toString()).child(datkey).child("stock")
+                    var stockCost: Int = 0
+                    for (i in 0..databaseStock.childrenCount - 1) {
+                        //현재 재고의 정보
+                        var databaseNowStock = databaseStock.child("s" + i)
+                        //재고 정보의 가격 * 개수
+                        //재고 개수
+                        var stockNum =
+                            Integer.parseInt(databaseNowStock.child("stockNum").value.toString())
+                        //재고 가격
+                        var stockPrice =
+                            Integer.parseInt(databaseNowStock.child("stockPrice").value.toString())
+
+                        var money = stockNum * stockPrice
+                        //총 직원 급여 변수에 현재 직원 급여 더하기
+                        stockCost += money
+                    }
+
+                    //입고예정 재고 총 비용
+                    var databaseAheadStock =
+                        p0.child(userId.toString()).child(datkey).child("aheadStock")
+                    var aheadStockCost: Int = 0
+                    for (i in 0..databaseAheadStock.childrenCount - 1) {
+                        //현재 재고의 정보
+                        var databaseNowAheadStock = databaseAheadStock.child("as" + i)
+                        //재고 정보의 가격 * 개수
+                        var money =
+                            Integer.parseInt(databaseNowAheadStock.child("aheadStockNum").value.toString()) * Integer.parseInt(
+                                databaseNowAheadStock.child("aheadStockPrice").value.toString()
+                            )                    //총 직원 급여 변수에 현재 직원 급여 더하기
+                        aheadStockCost += money
+                    }
+
+                    //두개 합친거
+                    var allStock: Int = stockCost + aheadStockCost
+                    //textview에 재고비용 입력
+                    textViewStock.setText(allStock.toString())
+
+
+                    //원 계산(매출액 - (매장월세 + 직원급여 + 재고비용))
+                    var profit: Int =
+                        Integer.parseInt(sales.toString()) - (Integer.parseInt(rent.toString()) + salaryM + allStock)
+                    textViewM.setText(profit.toString() + " 원")
+                }
+
+                override fun onCancelled(p0: DatabaseError) {
+
+                }
+
+            })
+        }
+
         databaseUser.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(p0: DataSnapshot) {
                 //매출액 필드 값 변경
                 //user -> userId -> datekey -> sales 의 값
                 var sales = p0.child(userId.toString()).child(datkey).child("sales").value
-                if(sales == null){
+                if (sales == null) {
                     sales = 0
                 }
                 textViewSales.setText(sales.toString())
@@ -108,7 +201,7 @@ class SalesFragment(var userId : String?) : Fragment() {
                 //매장월세 변경
                 //user -> userId -> rentPrice 의 값
                 var rent = p0.child(userId.toString()).child("rentPrice").value
-                if(rent == null){
+                if (rent == null) {
                     rent = 0
                 }
                 textViewRent.setText(rent.toString())
@@ -118,12 +211,15 @@ class SalesFragment(var userId : String?) : Fragment() {
                 var databaseEmp = p0.child(userId.toString()).child(datkey).child("emp")
                 //직원 수 만큼 돌려
                 //총금액변수
-                var salaryM : Int = 0
-                for (i in 0..databaseEmp.childrenCount-1){
+                var salaryM: Int = 0
+                for (i in 0..databaseEmp.childrenCount - 1) {
                     //현재 직원의 정보
-                    var databaseNowEmp = databaseEmp.child("e"+i)
+                    var databaseNowEmp = databaseEmp.child("e" + i)
                     //직원 정보의 시급 * 시간
-                    var money = Integer.parseInt(databaseNowEmp.child("empSalary").value.toString()) * Integer.parseInt(databaseNowEmp.child("empTime").value.toString())
+                    var money =
+                        Integer.parseInt(databaseNowEmp.child("empSalary").value.toString()) * Integer.parseInt(
+                            databaseNowEmp.child("empTime").value.toString()
+                        )
                     //총 직원 급여 변수에 현재 직원 급여 더하기
                     salaryM += money
                 }
@@ -133,15 +229,17 @@ class SalesFragment(var userId : String?) : Fragment() {
                 //재고비용 변경 (재고 + 예정재고)
                 //재고 총 비용
                 var databaseStock = p0.child(userId.toString()).child(datkey).child("stock")
-                var stockCost : Int = 0
-                for (i in 0..databaseStock.childrenCount - 1){
+                var stockCost: Int = 0
+                for (i in 0..databaseStock.childrenCount - 1) {
                     //현재 재고의 정보
-                    var databaseNowStock = databaseStock.child("s"+i)
+                    var databaseNowStock = databaseStock.child("s" + i)
                     //재고 정보의 가격 * 개수
                     //재고 개수
-                    var stockNum = Integer.parseInt(databaseNowStock.child("stockNum").value.toString())
+                    var stockNum =
+                        Integer.parseInt(databaseNowStock.child("stockNum").value.toString())
                     //재고 가격
-                    var stockPrice = Integer.parseInt(databaseNowStock.child("stockPrice").value.toString())
+                    var stockPrice =
+                        Integer.parseInt(databaseNowStock.child("stockPrice").value.toString())
 
                     var money = stockNum * stockPrice
                     //총 직원 급여 변수에 현재 직원 급여 더하기
@@ -149,26 +247,32 @@ class SalesFragment(var userId : String?) : Fragment() {
                 }
 
                 //입고예정 재고 총 비용
-                var databaseAheadStock = p0.child(userId.toString()).child(datkey).child("aheadStock")
-                var aheadStockCost:Int = 0
-                for (i in 0..databaseAheadStock.childrenCount - 1){
+                var databaseAheadStock =
+                    p0.child(userId.toString()).child(datkey).child("aheadStock")
+                var aheadStockCost: Int = 0
+                for (i in 0..databaseAheadStock.childrenCount - 1) {
                     //현재 재고의 정보
-                    var databaseNowAheadStock = databaseAheadStock.child("as"+i)
+                    var databaseNowAheadStock = databaseAheadStock.child("as" + i)
                     //재고 정보의 가격 * 개수
-                    var money = Integer.parseInt(databaseNowAheadStock.child("aheadStockNum").value.toString()) * Integer.parseInt(databaseNowAheadStock.child("aheadStockPrice").value.toString())                    //총 직원 급여 변수에 현재 직원 급여 더하기
+                    var money =
+                        Integer.parseInt(databaseNowAheadStock.child("aheadStockNum").value.toString()) * Integer.parseInt(
+                            databaseNowAheadStock.child("aheadStockPrice").value.toString()
+                        )                    //총 직원 급여 변수에 현재 직원 급여 더하기
                     aheadStockCost += money
                 }
 
                 //두개 합친거
-                var allStock:Int = stockCost + aheadStockCost
+                var allStock: Int = stockCost + aheadStockCost
                 //textview에 재고비용 입력
                 textViewStock.setText(allStock.toString())
 
 
                 //원 계산(매출액 - (매장월세 + 직원급여 + 재고비용))
-                var profit:Int = Integer.parseInt(sales.toString()) - (Integer.parseInt(rent.toString()) + salaryM + allStock)
+                var profit: Int =
+                    Integer.parseInt(sales.toString()) - (Integer.parseInt(rent.toString()) + salaryM + allStock)
                 textViewM.setText(profit.toString() + " 원")
             }
+
             override fun onCancelled(p0: DatabaseError) {
 
             }

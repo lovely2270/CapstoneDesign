@@ -141,7 +141,7 @@
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
             android:layout_weight="1"
-            android:background="@android:color/holo_green_light"
+            android:background="@android:color/darker_gray"
             android:text="취소"
             android:textSize="18sp" />
 
@@ -152,7 +152,7 @@
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
             android:layout_weight="1"
-            android:background="@android:color/holo_green_light"
+            android:background="@android:color/holo_blue_light"
             android:text="수정"
             android:textSize="18sp" />
     </LinearLayout>
