@@ -6,10 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import com.google.firebase.database.DataSnapshot
@@ -96,7 +93,8 @@ class SalesFragment(var userId : String?) : Fragment() {
         }
 
         //데이터값 변경될 시 리스너
-        var btn_refresh : Button = inflaterview.findViewById(R.id.btn_refresh)
+        var btn_refresh : ImageButton = inflaterview.findViewById(R.id.imgbtn_refresh)
+        //var btn_refresh : Button = inflaterview.findViewById(R.id.btn_refresh)
         btn_refresh.setOnClickListener{
             databaseUser.addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(p0: DataSnapshot) {

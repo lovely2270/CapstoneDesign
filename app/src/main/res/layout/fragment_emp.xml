@@ -34,7 +34,9 @@
             android:layout_height="wrap_content"
             android:layout_gravity="right"
             android:layout_margin="30dp"
-            android:text="직원 추가" />
+            android:background="@color/colorPrimaryDark"
+            android:text="직원 추가"
+            android:textColor="#FFFFFF" />
     </LinearLayout>
 
 </RelativeLayout>
