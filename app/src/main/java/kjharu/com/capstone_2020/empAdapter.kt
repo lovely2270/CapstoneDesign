@@ -5,6 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
+import android.widget.RadioButton
+import android.widget.RadioGroup
 import android.widget.TextView
 import com.google.firebase.database.FirebaseDatabase
 import kotlinx.android.synthetic.main.activity_join.view.*
@@ -24,7 +26,8 @@ class empAdapter(context: Context, var empList: ArrayList<Emp>, var userId : Str
         val empName = view.findViewById<TextView>(R.id.empName)
         val empSalary = view.findViewById<TextView>(R.id.empSalary)
         val empTime = view.findViewById<TextView>(R.id.empTime)
-        val empType = view.findViewById<TextView>(R.id.empType)
+        val empType =  view.findViewById<TextView>(R.id.empType)
+
 
         /* ArrayList<Dog>의 변수 dog의 이미지와 데이터를 ImageView와 TextView에 담는다. */
         val emp = empList[position]

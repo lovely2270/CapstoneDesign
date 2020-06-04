@@ -6,10 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ListView
+import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import com.google.firebase.database.DataSnapshot
@@ -19,6 +16,8 @@ import com.google.firebase.database.ValueEventListener
 import kotlinx.android.synthetic.main.listview_emp.*
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import kotlinx.android.synthetic.main.emp_add.*
+import android.widget.RadioGroup
 
 class EmpFragment(var userId : String?) : Fragment() {
 
@@ -26,6 +25,7 @@ class EmpFragment(var userId : String?) : Fragment() {
     val databaseUser = firebaseReference.reference.child("user")
     var empList = ArrayList<Emp>()
     var count : Int = 0
+    //var empRadioType : String = "직원"
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
@@ -51,7 +51,7 @@ class EmpFragment(var userId : String?) : Fragment() {
             override fun onDataChange(p0: DataSnapshot) {
 
                 empList.clear()
-                //재고 경로
+                //직원 경로
                 var databaseStock = p0.child(userId.toString()).child(datkey).child("emp")
 
                 for (i in 0..databaseStock.childrenCount - 1) {
@@ -97,17 +97,49 @@ class EmpFragment(var userId : String?) : Fragment() {
                     var typeNow = p0.child(userId.toString()).child(datkey).child("emp")
                         .child("e" + position).child("empType").value
 
+
                     val empName = dialogView.findViewById<EditText>(R.id.empNameForAdd)
                     empName.setText(nameNow.toString())
                     val empSalary = dialogView.findViewById<EditText>(R.id.empSalaryForAdd)
                     empSalary.setText(salaryNow.toString())
                     val empTime = dialogView.findViewById<EditText>(R.id.empTimeForAdd)
                     empTime.setText(timeNow.toString())
-                    val empType = dialogView.findViewById<EditText>(R.id.empTypeForAdd)
+                    val empType = dialogView.findViewById<RadioGroup>(R.id.radio_group)
+                   // empType.setText(typeNow.toString())
+                  /*  val empTypeJ = dialogView.findViewById<RadioButton>(R.id.radio_j)
                     empType.setText(typeNow.toString())
+                    val empTypeA = dialogView.findViewById<RadioButton>(R.id.radio_a)
+                    empType.setText(typeNow.toString())*/
+
+                    /*
+                    empType.setOnCheckedChangeListener { group, checkedId ->
+                        if (group.id == R.id.radio_group) {
+                            if (checkedId == R.id.radio_j) {
+                                if (radio_j.isChecked == true) {
+                                    radio_j.isChecked = true
+                                    radio_a.isChecked = false
+                                    empRadioType = radio_j.text.toString()
+                                }
+                            } else if (checkedId == R.id.radio_a) {
+                                if (radio_a.isChecked == true) {
+                                    radio_j.isChecked = false
+                                    radio_a.isChecked = true
+                                    empRadioType = radio_a.text.toString()
+                                }
+                            }
+                        }
+                    }*/
+
+
 
                     builder.setNegativeButton("취소", null)
                     builder.setPositiveButton("확인") { dialogInterface, i ->
+                        var empRadioType : String = ""
+                        if(empType.checkedRadioButtonId == R.id.radio_j){
+                            empRadioType = "직원"
+                        }else {
+                            empRadioType = "알바"
+                        }
 
                         //DB에 저장
                         databaseUser.child(userId.toString()).child(datkey).child("emp")
@@ -121,7 +153,13 @@ class EmpFragment(var userId : String?) : Fragment() {
                             .setValue(empTime.text.toString())
                         databaseUser.child(userId.toString()).child(datkey).child("emp")
                             .child("e" + position).child("empType")
-                            .setValue(empType.text.toString())
+                            .setValue(empRadioType)
+                       /* databaseUser.child(userId.toString()).child(datkey).child("emp")
+                            .child("e" + position).child("empType")
+                            .setValue(empTypeJ.text.toString())
+                        databaseUser.child(userId.toString()).child(datkey).child("emp")
+                            .child("e" + position).child("empType")
+                            .setValue(empTypeA.text.toString())*/
                     }
                     empAdapter.notifyDataSetChanged()
                     empAdapter.notifyDataSetInvalidated()
@@ -190,7 +228,7 @@ class EmpFragment(var userId : String?) : Fragment() {
             true
         })
 
-        //재고 추가 버튼 클릭
+        //직원 추가 버튼 클릭
         var btn_addEmp: Button = inflaterview.findViewById(R.id.btn_addEmp)
         btn_addEmp.setOnClickListener {
             databaseUser.addListenerForSingleValueEvent(object : ValueEventListener {
@@ -204,30 +242,73 @@ class EmpFragment(var userId : String?) : Fragment() {
                     val empName = dialogView.findViewById<EditText>(R.id.empNameForAdd)
                     val empSalary = dialogView.findViewById<EditText>(R.id.empSalaryForAdd)
                     val empTime = dialogView.findViewById<EditText>(R.id.empTimeForAdd)
-                    val empType = dialogView.findViewById<EditText>(R.id.empTypeForAdd)
+                    val empType = dialogView.findViewById<RadioGroup>(R.id.radio_group)
 
-                    builder.setNegativeButton("취소", null)
-                    builder.setPositiveButton("확인") { dialogInterface, i ->
+                   /* var memptype: RadioGroup.OnCheckedChangeListener =
+                        RadioGroup.OnCheckedChangeListener { group, checkedId ->
+                            if (group.id == R.id.radio_group) {
+                                if (checkedId == R.id.radio_j) {
+                                    if (radio_j.isChecked == true) {
+                                        radio_j.isChecked = true
+                                        radio_a.isChecked = false
+                                        empRadioType = radio_j.text.toString()
+                                    }
+                                } else if (checkedId == R.id.radio_a) {
+                                    if (radio_a.isChecked == true) {
+                                        radio_j.isChecked = false
+                                        radio_a.isChecked = true
+                                        empRadioType = radio_a.text.toString()
+                                    }
+                                }
+                            }
+                        }*/
+                    /*
+                    empType.setOnCheckedChangeListener { group, checkedId ->
+                        if (group.id == R.id.radio_group) {
+                            if (checkedId == R.id.radio_j) {
+                                if (radio_j.isChecked == true) {
+                                    radio_j.isChecked = true
+                                    radio_a.isChecked = false
+                                    empRadioType = radio_j.text.toString()
+                                }
+                            } else if (checkedId == R.id.radio_a) {
+                                if (radio_a.isChecked == true) {
+                                    radio_j.isChecked = false
+                                    radio_a.isChecked = true
+                                    empRadioType = radio_a.text.toString()
+                                }
+                            }
+                        }
+                    }*/
 
-                        //DB에 저장
-                        databaseUser.child(userId.toString()).child(datkey).child("emp")
-                            .child("e" + count).child("empName")
-                            .setValue(empName.text.toString())
-                        databaseUser.child(userId.toString()).child(datkey).child("emp")
-                            .child("e" + count).child("empSalary")
-                            .setValue(empSalary.text.toString())
-                        databaseUser.child(userId.toString()).child(datkey).child("emp")
-                            .child("e" + count).child("empTime").setValue(empTime.text.toString())
-                        databaseUser.child(userId.toString()).child(datkey).child("emp")
-                            .child("e" + count).child("empType")
-                            .setValue(empType.text.toString())
-                    }
-                    empAdapter.notifyDataSetChanged()
-                    empAdapter.notifyDataSetInvalidated()
-
-                    builder.show()
+                            builder.setNegativeButton("취소", null)
+                            builder.setPositiveButton("확인") { dialogInterface, i ->
+                                var empRadioType : String = ""
+                                if(empType.checkedRadioButtonId == R.id.radio_j){
+                                    empRadioType = "직원"
+                                }else {
+                                    empRadioType = "알바"
+                                }
+                                //DB에 저장
+                                databaseUser.child(userId.toString()).child(datkey).child("emp")
+                                    .child("e" + count).child("empName")
+                                    .setValue(empName.text.toString())
+                                databaseUser.child(userId.toString()).child(datkey).child("emp")
+                                    .child("e" + count).child("empSalary")
+                                    .setValue(empSalary.text.toString())
+                                databaseUser.child(userId.toString()).child(datkey).child("emp")
+                                    .child("e" + count).child("empTime")
+                                    .setValue(empTime.text.toString())
+                                databaseUser.child(userId.toString()).child(datkey).child("emp")
+                                .child("e" + count).child("empType")
+                                .setValue(empRadioType)
                 }
+                            empAdapter.notifyDataSetChanged()
+                            empAdapter.notifyDataSetInvalidated()
 
+                            builder.show()
+
+                }
                 override fun onCancelled(error: DatabaseError) {
                     // Failed to read value
                 }
