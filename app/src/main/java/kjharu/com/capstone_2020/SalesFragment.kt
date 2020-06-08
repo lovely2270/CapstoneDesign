@@ -75,6 +75,7 @@ class SalesFragment(var userId : String?) : Fragment() {
             builder.setMessage("판매액")
 
             var editTextSales : EditText = EditText(context)
+            editTextSales.setHint("숫자입력")
             builder.setView(editTextSales)
 
             builder.setNegativeButton("취소", null)
