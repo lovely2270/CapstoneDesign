@@ -135,6 +135,7 @@ class SalesFragment(var userId : String?) : Fragment() {
                     //textview에 직원 급여 입력
                     textViewSalary.setText(salaryM.toString())
 
+                    /*
                     //재고비용 변경 (재고 + 예정재고)
                     //재고 총 비용
                     var databaseStock = p0.child(userId.toString()).child(datkey).child("stock")
@@ -154,6 +155,8 @@ class SalesFragment(var userId : String?) : Fragment() {
                         //총 직원 급여 변수에 현재 직원 급여 더하기
                         stockCost += money
                     }
+                    */
+
 
                     //입고예정 재고 총 비용
                     var databaseAheadStock =
@@ -171,20 +174,26 @@ class SalesFragment(var userId : String?) : Fragment() {
                     }
 
                     //두개 합친거
-                    var allStock: Int = stockCost + aheadStockCost
+                    //var allStock: Int = stockCost + aheadStockCost
                     //textview에 재고비용 입력
-                    textViewStock.setText(allStock.toString())
+                    textViewStock.setText(aheadStockCost.toString())
 
 
                     //원 계산(매출액 - (매장월세 + 직원급여 + 재고비용))
                     var profit: Int =
-                        Integer.parseInt(sales.toString()) - (Integer.parseInt(rent.toString()) + salaryM + allStock)
+                        Integer.parseInt(sales.toString()) - (Integer.parseInt(rent.toString()) + salaryM + aheadStockCost)
                     textViewM.setText(profit.toString() + " 원")
+
+                    //순수익 파이어베이스에 저장
+                    //순수익 가져오기
+                    var amountM = textViewM.text
+                    databaseYM.child("amount").setValue(amountM)
                 }
 
                 override fun onCancelled(p0: DatabaseError) {
 
                 }
+
 
             })
         }
@@ -227,6 +236,7 @@ class SalesFragment(var userId : String?) : Fragment() {
                 //textview에 직원 급여 입력
                 textViewSalary.setText(salaryM.toString())
 
+                /*
                 //재고비용 변경 (재고 + 예정재고)
                 //재고 총 비용
                 var databaseStock = p0.child(userId.toString()).child(datkey).child("stock")
@@ -246,6 +256,7 @@ class SalesFragment(var userId : String?) : Fragment() {
                     //총 직원 급여 변수에 현재 직원 급여 더하기
                     stockCost += money
                 }
+                */
 
                 //입고예정 재고 총 비용
                 var databaseAheadStock =
@@ -263,15 +274,20 @@ class SalesFragment(var userId : String?) : Fragment() {
                 }
 
                 //두개 합친거
-                var allStock: Int = stockCost + aheadStockCost
+                //var allStock: Int = stockCost + aheadStockCost
                 //textview에 재고비용 입력
-                textViewStock.setText(allStock.toString())
+                textViewStock.setText(aheadStockCost.toString())
 
 
                 //원 계산(매출액 - (매장월세 + 직원급여 + 재고비용))
                 var profit: Int =
-                    Integer.parseInt(sales.toString()) - (Integer.parseInt(rent.toString()) + salaryM + allStock)
+                    Integer.parseInt(sales.toString()) - (Integer.parseInt(rent.toString()) + salaryM + aheadStockCost)
                 textViewM.setText(profit.toString() + " 원")
+
+                //순수익 파이어베이스에 저장
+                //순수익 가져오기
+                var amountM = textViewM.text
+                databaseYM.child("amount").setValue(amountM)
             }
 
             override fun onCancelled(p0: DatabaseError) {

@@ -19,8 +19,10 @@ class MenuActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_menu)
         setTitle("떡잎방범대")
+        //LoginActivity에서 넘겨준 변수 받아오기
         userId = intent.getStringExtra("userId")
 
+        //탭뷰만들어줌
         val fragmentAdapter = MyPagerAdapter(supportFragmentManager, userId)
         viewpager.adapter = fragmentAdapter
         tab.setupWithViewPager(viewpager)
